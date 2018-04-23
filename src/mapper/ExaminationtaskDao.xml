@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8" ?>   
+<!DOCTYPE mapper   
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"   
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+    <mapper namespace='com.jiekou.sj.ExaminationtaskDao'>
+    
+    <resultMap type="users" id="eandt">
+    <id property="eid" column="eid" />
+    <id property="enotice" column="enotice" />
+    <id property="releasedepartment" column="releasedepartment" />
+    <id property="signingdepartment" column="signingdepartment" />
+    <id property="ename" column="ename" />
+    <id property="post" column="post" />
+    <id property="teacher" column="teacher" />
+    <id property="ebegintime" column="ebegintime" />
+    <!-- <id property="eendtime" column="eendtime" /> -->
+    <id property="imagedata" column="imagedata" />
+    <id property="questionnaire" column="questionnaire" />
+    <id property="surveyratio" column="surveyratio" />
+    <id property="tid" column="tid" />
+    <collection property="trainingtask" ofType="Trainingtask">
+    <id property="id" column="id" />
+    <id property="trainingname" column="trainingname" />
+   	<id property="participants" column="participants" />
+   	<id property="recipient" column="recipient" />
+   	<id property="trainingteachers" column="trainingteachers" />
+   	<id property="releasedepartment" column="releasedepartment" />
+    </collection>
+   </resultMap>
+   
+   
+   <select id="selecteandt" resultMap="eandt">
+	SELECT 
+  	t.`trainingname` 
+	FROM
+  	examinationtask e 
+  	JOIN trainingtask t 
+    ON e.`tid` = t.`id`
+   </select> 
+   
+   <select id="selecttname" resultType="com.model.sj.Trainingtask">
+		SELECT t.`trainingname`,t.`id` FROM trainingtask t
+	</select>
+    
+     <select id="selectT" resultType="com.model.sj.Examinationtask">
+		select * from examinationtask
+	</select>
+
+     <insert id="insertET" parameterType="com.model.sj.Examinationtask" >
+     insert into examinationtask(enotice,releasedepartment,signingdepartment,ename,post,teacher,ebegintime,imagedata,questionnaire,surveyratio) values(#{enotice}, #{releasedepartment},#{signingdepartment},#{ename},#{post},#{teacher},#{ebegintime},#{imagedata},#{questionnaire},#{surveyratio});
+     </insert>
+    </mapper>

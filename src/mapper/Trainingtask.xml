@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8" ?>   
+<!DOCTYPE mapper   
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"   
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+    <mapper namespace='com.jiekou.sj.TrainingtaskDao'>
+     <select id="selectT" parameterType="com.model.sj.Trainingtask" 
+		resultType="com.model.sj.Trainingtask">
+		select * from trainingtask
+	</select>
+	<select id="selectadress" resultType="java.lang.String">
+	SELECT trainingnotice FROM trainingtask
+	</select>
+     <insert id="insert" parameterType="com.model.sj.Trainingtask" >
+     insert into trainingtask(trainingnotice, trainingname,trainingtype,trainingmode,ttime,traininghours,trainingmaterials,departments,participants,trainer,trainingimage,examination,recordingperiod) values(#{trainingnotice}, #{trainingname},#{trainingtype},#{trainingmode},#{ttime},#{traininghours},#{trainingmaterials},#{departments},#{participants},#{trainer},#{trainingimage},#{examination},#{recordingperiod});
+     </insert>
+     
+     <select id="selectLike" parameterType="com.model.sj.Trainingtask" resultType="com.model.sj.Trainingtask">
+     select * from trainingtask 
+     where 
+     <if test="releasedepartment!=null">
+     releasedepartment like concat('%',#{releasedepartment},'%')
+     </if>
+     <if test="departments!=null">
+     and departments like concat('%',#{departments},'%')
+     </if>
+     <if test="trainingname!=null">
+     and trainingname like concat('%',#{trainingname},'%')
+     </if>
+     <if test="ttime!=null">
+     and ttime like concat('%',#{ttime},'%')
+     </if>
+     <if test="recipient!=null">
+     and recipient like concat('%',#{recipient},'%')
+     </if>
+     <if test="trainer!=null">
+     and trainer like concat('%',#{trainer},'%')
+     </if>
+	</select>
+    </mapper>

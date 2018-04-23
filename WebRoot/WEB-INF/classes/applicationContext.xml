@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans
+	xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:p="http://www.springframework.org/schema/p"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:aop="http://www.springframework.org/schema/aop" 
+	xmlns:mvc="http://www.springframework.org/schema/mvc"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+	 	http://www.springframework.org/schema/context 
+       http://www.springframework.org/schema/context/spring-context-3.0.xsd
+       http://www.springframework.org/schema/tx 
+       http://www.springframework.org/schema/tx/spring-tx-3.0.xsd
+       http://www.springframework.org/schema/aop
+       http://www.springframework.org/schema/aop/spring-aop-3.0.xsd
+      http://www.springframework.org/schema/mvc 
+      http://www.springframework.org/schema/mvc/spring-mvc-3.0.xsd">
+     <!-- 开启注解（让机器识别注解） -->
+     <mvc:annotation-driven/>
+      <!-- 自动扫描带注解的类，生成相应的bean及bean与bean之间的引用 -->
+      <context:component-scan base-package="com"/><!-- com代表扫描所有com下的包类 -->
+      <!-- 配置数据源 -->
+      <!-- combo出现 --><!-- 前面代表p标签属性名，“”里代表 value值 -->
+      <bean id="dataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource"  
+     	 p:driverClass="com.mysql.jdbc.Driver"
+      	p:jdbcUrl="jdbc:mysql://localhost:3306/db_zsl"
+      	p:user="root"
+      	p:password="root"/>
+      	<!-- 配置sqlsessionFactory -->
+      	<!--对应的mapper包下的xml  -->
+    <!--p:mapperLocations 自动扫描SQL映射文件，Mapper代表文件所处的文件夹  
+      	 p:typeAliasesPackage 自动扫描实体类所处的包，将类名转化成小写就不用写完整的路径了，作为mybatis的参数名和返回结果名,
+	p:dataSource-ref="dataSource"映射的数据源连接对应的数据库-->
+      <bean id="factory" class="org.mybatis.spring.SqlSessionFactoryBean"
+      p:dataSource-ref="dataSource"
+      p:configLocation="classpath:mybatis-config.xml"
+      p:mapperLocations="classpath:mapper/*.xml"
+      p:typeAliasesPackage="com.model.sj"
+      />
+      <!--p:configLocation 加载mybatis-config.xml文件 -->
+     <!-- spring与mybatis整合配置,扫描所有dao包下的接口 -->
+      <!-- p:basePackage 自动扫描数据库访问接口所处的包，将sqlsessionFactory和接口建立连接,
+	通过sqlsessionFacctroy获得Session.getMapper(接口类名.class)方法将接口反射成一个对象，这样在class类里就不用写这个方法将我们的
+		接口反射成一个对象了-->
+      <bean class="org.mybatis.spring.mapper.MapperScannerConfigurer"
+      p:basePackage="com.jiekou.sj"
+      p:sqlSessionFactoryBeanName="factory"
+      /><!--p:sqlSessionFactoryBeanName 自动把接口加入sqlsessionFactory "factory"是跟我们的
+	sqlSessionFactory中bean的ID的名字对应上就自动给我们的接口自动加入sqlSessionFactory-->
+      <!-- 让框架允许访问静态资源，静态资源包括(*.css,*.jpg,*.js,*.html) -->
+      <mvc:resources location="/css/" mapping="/css/**"/><!-- location代表访问的文件夹/"/"代表里面文件夹 的子目录-->
+       <mvc:resources location="/img/" mapping="/img/**"/><!--css/**代表访问css里所有的子文件  -->
+        <mvc:resources location="/js/" mapping="/js/**"/>
+         <mvc:resources location="/lib/" mapping="/lib/**"/>
+         <mvc:resources location="/pic/" mapping="/pic/**"/>
+         <mvc:resources location="/config/" mapping="/config/**"/>
+         <mvc:resources location="/pages/" mapping="/pages/**"/>
+        <mvc:resources location="/attached/" mapping="/attached/**"/><!-- 配置静态资源 -->
+      <!-- 配置视图解析器 -->
+      <!-- prefix要访问页面的前缀，就是页面在webroot的哪个文件夹中，例如/pages/代表得到的是pages文件夹中的jsp页面-->
+      <!-- p:suffix要访问页面的后缀，就是页面的扩展名 -->
+      <bean class="org.springframework.web.servlet.view.InternalResourceViewResolver"
+      	p:viewClass="org.springframework.web.servlet.view.JstlView"
+      	p:prefix="/"
+      	p:suffix=".jsp"
+      />
+       <bean class="org.springframework.web.servlet.view.InternalResourceViewResolver"
+      	p:viewClass="org.springframework.web.servlet.view.JstlView"
+      	p:prefix="/pages/annoumcement/"
+      	p:suffix=".jsp"
+      />
+       <bean class="org.springframework.web.servlet.view.InternalResourceViewResolver"
+      	p:viewClass="org.springframework.web.servlet.view.JstlView"
+      	p:prefix="/pages/train/"
+      	p:suffix=".jsp"
+      />
+  	<!-- 1.maxUploadSize 上传的最大字节数，-1代表没有任何限制
+	 2.maxInMemorySize 读取文件到内存中最大的字节数，默认是1024
+	 3.defaultEncoding 文件上传头部编码，默认是iso-8859-1，注意defaultEncoding必须和用户的jsp的
+	 pageEncoding属性一致，以便能正常读取文件
+	 4.uploadTempDir文件上传暂存目录，文件上传完成之后会清除该目录，模式是在servlet容器的临时目录，
+	 例如tomcat的话，就是在tomcat文件夹的temp目录
+	 -->
+	<bean id="multipartResolver" class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
+		<property name="maxUploadSize" value="52428800" />
+		<property name="maxInMemorySize" value="4096" />
+		<property name="defaultEncoding" value="UTF-8"></property>
+	</bean>	 
+	 <!-- 配置事务管理器 -->
+	
+	<bean id="transactionManager"
+		class="org.springframework.jdbc.datasource.DataSourceTransactionManager"
+		p:dataSource-ref="dataSource" /><!--p:dataSource-ref="dataSource" 
+		配置事务管理器的作用就是如果数据库同时删除2个数据，其中一个没删除的话，那么另一个数据也不会提交事务。这就是好处-->
+
+	<!-- 通过AOP配置提供事务增强，让service包下所有Bean的所有方法拥有事务 -->
+	<!--*代表所有的方法..代表所有的类和所有方法。..*连起来就是所有的类和所有的方法。* com代表所有service包下和所有子包下-->
+	<aop:config proxy-target-class="true">
+		<aop:pointcut id="serviceMethod"
+			expression=" execution(* com.*.controller..*(..))" />
+		<aop:advisor pointcut-ref="serviceMethod" advice-ref="txAdvice" />
+	</aop:config>
+         <!--<tx:advice>：事务通知定义，用于指定事务属性，其中“transaction-manager”属性指定事务管理器，并通过< tx:attributes >指定具体需要拦截的方法；-->
+	<!--<tx:method name="*">：表示将拦截其他所有方法，被拦截的方法将应用配置的事务属性：-->
+        <!--<tx:advice>：id用于指定此通知的名字也就是aop中的advice-ref="txAdvice"依赖的名ID名称， transaction-manager用于指定事务管理器，默认的事务管理器名字为“transactionManager”；-->
+	<tx:advice id="txAdvice" transaction-manager="transactionManager">
+		<tx:attributes>
+			<tx:method name="*" />
+		</tx:attributes>
+	</tx:advice>
+</beans>

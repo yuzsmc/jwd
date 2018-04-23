@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8" ?>   
+<!DOCTYPE mapper   
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"   
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+    <mapper namespace='com.jiekou.sj.NoticeDao'>
+	
+	 
+     <insert id='insert' parameterType="notice">
+      insert notice (item,StartTime,EndTime,notice_text,get,post,person,longer) 
+      values(#{item},#{StartTime},#{EndTime},#{notice_text},#{get},#{post},#{person},#{longer})
+     </insert>
+     
+      <select id='selectall' resultType='notice'>
+     select * from notice
+     </select>
+     
+     <select id='selectone' parameterType="java.lang.Integer" resultType='notice'>
+     select * from notice where notice_id=#{notice_id}
+     </select>
+     
+     <select id='select' parameterType='notice' resultType='notice'>
+     select * from notice 
+     where
+    <trim suffixOverrides="and"><!--prefix=代表加上set  suffixOverridex代表去掉最后一个列的逗号 -->
+     <if test="post!='' and post!=null">
+       post=#{post} and 
+     </if>
+     <if test="get!='' and get!=null">
+      get=#{get} and 
+     </if>
+     <if test="person!='' and person!=null">
+      person=#{person} and 
+     </if>
+     <if test="StartTime!='' and StartTime!=null">
+     StartTime=#{StartTime} and 
+     </if>
+      <if test="EndTime!='' and EndTime!=null">
+     EndTime=#{EndTime} and 
+     </if>
+       <if test="notice_text!='' and notice_text!=null">
+        notice_text like concat('%',#{notice_text},'%')
+     </if>
+    </trim>
+
+     </select>
+     
+     <update id='update' parameterType='notice'>
+     update notice 
+    <trim prefix="set" suffixOverrides=","><!-- suffixOverridex代表去掉最后一个列的逗号 -->
+     <if test="item!=''">
+       item=#{item},
+     </if>
+     <if test="StartTime!=''">
+      StartTime=#{StartTime},
+     </if>
+     <if test="EndTime!=''">
+      EndTime=#{EndTime},
+     </if>
+     <if test="notice_text!=''">
+     notice_text=#{notice_text},
+     </if>
+      <if test="post!=''">
+      post=#{post},
+     </if>
+     <if test="get!=''">
+     get=#{get},
+     </if>
+     <if test="person!=''">
+     person=#{person},
+     </if>
+    </trim>
+     <where>
+      notice_id=#{notice_id}
+     </where>
+     </update>
+     
+     <delete id='delete' parameterType="java.lang.Integer">
+          delete from notice where notice_id=#{notice_id}
+     </delete>
+    </mapper>
